@@ -37,7 +37,7 @@ class microglia():
             image = raw_image.copy()
             max_pro = np.max(image, axis=0)
             model = models.Cellpose(gpu=False, model_type='cyto')
-            masks, _, _, _ = model.eval(max_pro, diameter=45, channels=[0,0])
+            masks, _, _, _ = model.eval(max_pro, diameter=30, channels=[0,0])
 
             return masks
 
@@ -66,7 +66,7 @@ class microglia():
 
         self.raw_traces = roi2trace(self, self.fl_image, self.masks)
 
-        self.dff = mpf.deltaFOverF0(self.raw_traces, hz=20)
+        self.dff = mpf.deltaFOverF0(self.raw_traces, hz=0.43, t0=120, t1=120)
 
         def save_traces(cellID, trace, deltaF):
             if not os.path.exists('output'):
