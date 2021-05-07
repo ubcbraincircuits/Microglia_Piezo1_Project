@@ -21,7 +21,8 @@ bioRxiv 2020.02.02.931238; doi: https://doi.org/10.1101/2020.02.02.931238
 
 
 class microglia():
-    def __init__(self, path):
+    def __init__(self, path, hz):
+        self.HZ = hz
         # Open the image and return the two channels
         def openimages(self, path):
           raw_image = tifffile.imread(path)
@@ -68,7 +69,7 @@ class microglia():
 
         self.raw_traces = roi2trace(self, self.fl_image, self.masks)
 
-        self.dff = mpf.deltaFOverF0(self.raw_traces, hz=20)
+        self.dff = mpf.deltaFOverF0(self.raw_traces, hz=self.HZ)
 
         def save_traces(cellID, trace, deltaF):
             if not os.path.exists('output'):
@@ -116,7 +117,7 @@ class microglia():
 
             ax[0].plot(contour[0][:, 1],contour[0][:, 0], linewidth=4, color=color_list[ROI])
             ax[1].plot(trace_array[ROI, :], color=color_list[ROI])
-            ax[1].axvline(x=Frame, color=color_list[ROI])
+            ax[1].axvline(x=Frame, color=color_list[ROI], ls='--')
             plt.show()
 
         display(interact(plot, Frame=widgets.IntSlider(min=0, max=(channel1.shape[0]-1), step=1, value=0), ROI=widgets.IntSlider(min=1, max=(len(contours)-1), step=1, value=0),continuous_update=False))
