@@ -41,6 +41,10 @@ def lsm2tif(image_path, filename):
 
 
 def deltaFOverF0(data, hz, t0=0.2, t1=0.75, t2=3.0, iterFunc=None):
+    t0 = t0*(30/hz)
+    t1 = t1*(30/hz)
+    t2 = t2*(30/hz)
+    
     t0ratio = None if t0 is None else np.exp(-1 / (t0 * hz))
     t1samples, t2samples = round(t1 * hz), round(t2*hz)
 
