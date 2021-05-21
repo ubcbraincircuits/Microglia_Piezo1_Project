@@ -44,7 +44,7 @@ def deltaFOverF0(data, hz, t0=0.2, t1=0.75, t2=3.0, iterFunc=None):
     t0 = t0*(30/hz)
     t1 = t1*(30/hz)
     t2 = t2*(30/hz)
-    
+
     t0ratio = None if t0 is None else np.exp(-1 / (t0 * hz))
     t1samples, t2samples = round(t1 * hz), round(t2*hz)
 
@@ -95,3 +95,22 @@ def _forEachTimeseries(data, func, iterFunc=None):
             for j in iterFunc(range(data.shape[1])):
                 result[i, j] = func(data[i, j])
     return result
+
+#   Removes labels that are on the border of the image
+def filter_cropped_cells(masks):
+    filtered_masks = np.zeros_like(masks)
+    counter = 1
+    for cell in np.unique(masks):
+        if cell >0:
+            single_cell = np.zeros_like(masks)
+            single_cell = np.where(masks!=cell, single_cell, 1)
+            if (np.sum(single_cell[0,:]) or
+                np.sum(single_cell[:,0]) or
+                np.sum(single_cell[masks.shape[0]-1,:]) or
+                np.sum(single_cell[:,masks.shape[1]-1]))>1:
+                masks[masks==cell]=0
+    for cell in np.unique(masks):
+        if cell >0:
+            filtered_masks[masks==cell] = counter
+            counter+=1
+    return filtered_masks

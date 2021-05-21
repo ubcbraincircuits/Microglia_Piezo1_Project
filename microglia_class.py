@@ -21,7 +21,7 @@ bioRxiv 2020.02.02.931238; doi: https://doi.org/10.1101/2020.02.02.931238
 
 
 class microglia():
-    def __init__(self, path, hz):
+    def __init__(self, path, hz, filterCells=False):
         self.HZ = hz
         # Open the image and return the two channels
         def openimages(self, path):
@@ -34,17 +34,19 @@ class microglia():
         self.cell_id = os.path.basename(path)[:-4]
 
         self.fl_image, self.bf_image = openimages(self, path)
+        self.filterCells = filterCells
 
         # Generates masks of the dye filled cells
-        def return_masks(self, raw_image):
+        def return_masks(self, raw_image, fcc=False):
             image = raw_image.copy()
             max_pro = np.max(image, axis=0)
             model = models.Cellpose(gpu=False, model_type='cyto')
             masks, _, _, _ = model.eval(max_pro, diameter=45, channels=[0,0])
-
+            if fcc == True:
+                masks = mpf.filter_cropped_cells(masks)
             return masks
 
-        self.masks = return_masks(self, self.fl_image)
+        self.masks = return_masks(self, self.fl_image, fcc = self.filterCells)
 
         # Returns the raw intensity change of a ROI
         def rawIntensity(video_mask):
